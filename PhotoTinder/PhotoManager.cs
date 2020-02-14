@@ -3,10 +3,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Controls;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
-using Microsoft.Win32;
-
 //using Microsoft.Win32;
 
 namespace PhotoTinder
@@ -20,22 +19,27 @@ namespace PhotoTinder
         {
             _listOfPhotos.Clear();
 
-            var openFileDialog = new OpenFileDialog { Multiselect = true };
-
-            if (openFileDialog.ShowDialog() == true)            //load selected photos to _listOfPhotos
+            using (var openFileDialog = new OpenFileDialog {Multiselect = true})
             {
-                foreach (var openFile in openFileDialog.FileNames)
+                if (openFileDialog.ShowDialog() == DialogResult.OK) //load selected photos to _listOfPhotos
                 {
-                    var fileUri = new Uri(openFile);
-                    _listOfPhotos.AddPhoto(fileUri);
+                    foreach (var openFile in openFileDialog.FileNames)
+                    {
+                        var fileUri = new Uri(openFile);
+                        _listOfPhotos.AddPhoto(fileUri);
+                    }
                 }
-            }
 
-            Trace.WriteLine("acceptedPhotosName : " + _acceptedPhotosName);                  //for debugging purposes
-            Trace.WriteLine("openFileDialog.FileName : " + openFileDialog.FileName);        //for debugging purposes
-            _acceptedPhotosName = Regex.Replace(openFileDialog.FileName, @"[^\\]*$", @"") + _acceptedPhotosName;      //set the path for accepted photos folder
-            _removedPhotosName = Regex.Replace(openFileDialog.FileName, @"[^\\]*$", @"") + _removedPhotosName;      //set the path for removed photos folder
-            Trace.WriteLine("acceptedPhotosName After : " + _acceptedPhotosName);            //for debugging purposes
+                Trace.WriteLine("acceptedPhotosName : " + _acceptedPhotosName); //for debugging purposes
+                Trace.WriteLine("openFileDialog.FileName : " + openFileDialog.FileName); //for debugging purposes
+                _acceptedPhotosName =
+                    Regex.Replace(openFileDialog.FileName, @"[^\\]*$", @"") +
+                    _acceptedPhotosName; //set the path for accepted photos folder
+                _removedPhotosName =
+                    Regex.Replace(openFileDialog.FileName, @"[^\\]*$", @"") +
+                    _removedPhotosName; //set the path for removed photos folder
+                Trace.WriteLine("acceptedPhotosName After : " + _acceptedPhotosName); //for debugging purposes
+            }
         }
 
         public BitmapImage GetNextPhoto()
@@ -58,12 +62,13 @@ namespace PhotoTinder
             if (!Directory.Exists(_removedPhotosName))
                 Directory.CreateDirectory(_removedPhotosName);
 
-//            File.Delete(_listOfPhotos.GetActivePhotoUri().AbsolutePath);
-//            _listOfPhotos.RemoveActivePhoto();
-
-            File.Copy(_listOfPhotos.GetActivePhotoUri().AbsolutePath, _removedPhotosName + @"\" + _listOfPhotos.GetActivePhotoFileName());
-
             _listOfPhotos.RemoveActivePhoto();
+            File.Delete(_listOfPhotos.GetActivePhotoUri().AbsolutePath);
+
+
+//            File.Copy(_listOfPhotos.GetActivePhotoUri().AbsolutePath, _removedPhotosName + @"\" + _listOfPhotos.GetActivePhotoFileName());
+//
+//            _listOfPhotos.RemoveActivePhoto();
         }
 
         /// <summary>
