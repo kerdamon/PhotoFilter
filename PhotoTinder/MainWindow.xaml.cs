@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -23,8 +25,7 @@ namespace PhotoTinder
     public partial class MainWindow : Window
     {
         private PhotoList listOfPhotos = new PhotoList();
-        private int photoIndex;
-
+        private PhotoManager photoManager = new PhotoManager();
         string acceptedPhotosName = "Accepted Photos";
 
         public MainWindow()
@@ -34,51 +35,36 @@ namespace PhotoTinder
 
         private void BtnNextPhoto_OnClick(object sender, RoutedEventArgs e)
         {
-            if (photoIndex < listOfPhotos.Length() - 1)
-                photoIndex++;
-            else
-                photoIndex = 0;
-
-            ImgDisplayedPhoto.Source = listOfPhotos.GetPhoto(photoIndex);
+            ImgDisplayedPhoto.Source = photoManager.GetNextPhoto();
         }
 
         private void BtnPreviousPhoto_OnClick(object sender, RoutedEventArgs e)
         {
-            if (photoIndex > 0)
-                photoIndex--;
-            else
-                photoIndex = listOfPhotos.Length() - 1;
-
-            ImgDisplayedPhoto.Source = listOfPhotos.GetPhoto(photoIndex);
+            ImgDisplayedPhoto.Source = photoManager.GetPreviousPhoto();
         }
 
-        private void BtnRemovePhoto_OnClick(object sender, RoutedEventArgs e)
+        private void BtnDeletePhoto_OnClick(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            photoManager.DeletePhoto();
+            ImgDisplayedPhoto.Source = photoManager.GetActivePhoto();
+
+            //if ((ImgDisplayedPhoto.Source = listOfPhotos.GetNextPhoto()) == null)
+            //{
+            //    ImgDisplayedPhoto.Source = new BitmapImage(new Uri("https://upload.wikimedia.org/wikipedia/commons/3/30/Googlelogo.png"));
+            //}
+            //File.Delete(listOfPhotos.GetActivePhotoUri().AbsolutePath);
         }
 
         private void BtnAcceptPhoto_OnClick(object sender, RoutedEventArgs e)
         {
-            Directory.CreateDirectory(acceptedPhotosName);
+            photoManager.AcceptPhoto();
+            ImgDisplayedPhoto.Source = photoManager.GetActivePhoto();
         }
 
-        private void BtnChooseDirectory_OnClick(object sender, RoutedEventArgs e)
+        private void BtnChooseFiles_OnClick(object sender, RoutedEventArgs e)
         {
-            listOfPhotos.Clear();
-            var openFileDialog = new OpenFileDialog();
-            openFileDialog.Multiselect = true;
-
-            if (openFileDialog.ShowDialog() == true)
-            {
-                foreach (var openFile in openFileDialog.FileNames)
-                {
-                    var fileUri = new Uri(openFile);
-                    listOfPhotos.AddPhoto(new BitmapImage(fileUri));
-                    
-                }
-            }
-
-            ImgDisplayedPhoto.Source = listOfPhotos.GetPhoto();
+            photoManager.ChoosePhotos();
+            ImgDisplayedPhoto.Source = photoManager.GetActivePhoto();       //shows first photo after files were chosen
         }
     }
 }
