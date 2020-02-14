@@ -12,9 +12,15 @@ namespace PhotoTinder
 {
     public class PhotoManager
     {
-        private PhotoList _listOfPhotos = new PhotoList();
-        private string _acceptedPhotosName = "Accepted Photos";      //folder name for accepted photos
-        private string _removedPhotosName = "Removed Photos";
+        private PhotoList _listOfPhotos;
+        private string _acceptedPhotosName = "Accepted Photos";     //folder name for accepted photos
+        private string _removedPhotosName = "Removed Photos";       //folder name for removed photos
+
+        public PhotoManager()
+        {
+            _listOfPhotos = new PhotoList();
+        }
+
         public void ChoosePhotos()
         {
             _listOfPhotos.Clear();
@@ -26,19 +32,17 @@ namespace PhotoTinder
                     foreach (var openFile in openFileDialog.FileNames)
                     {
                         var fileUri = new Uri(openFile);
-                        _listOfPhotos.AddPhoto(fileUri);
+                        _listOfPhotos.AddPhoto(openFile);
                     }
                 }
 
-                Trace.WriteLine("acceptedPhotosName : " + _acceptedPhotosName); //for debugging purposes
-                Trace.WriteLine("openFileDialog.FileName : " + openFileDialog.FileName); //for debugging purposes
                 _acceptedPhotosName =
                     Regex.Replace(openFileDialog.FileName, @"[^\\]*$", @"") +
                     _acceptedPhotosName; //set the path for accepted photos folder
-                _removedPhotosName =
+
+                _removedPhotosName=
                     Regex.Replace(openFileDialog.FileName, @"[^\\]*$", @"") +
                     _removedPhotosName; //set the path for removed photos folder
-                Trace.WriteLine("acceptedPhotosName After : " + _acceptedPhotosName); //for debugging purposes
             }
         }
 
@@ -54,7 +58,10 @@ namespace PhotoTinder
 
         public BitmapImage GetActivePhoto()
         {
-            return _listOfPhotos.GetActivePhoto();
+            if(_listOfPhotos.GetActivePhoto() == null)
+                return new BitmapImage(new Uri(@"https://upload.wikimedia.org/wikipedia/commons/3/30/Googlelogo.png"));
+            else
+                return _listOfPhotos.GetActivePhoto();
         }
 
         public void DeletePhoto()
@@ -62,13 +69,9 @@ namespace PhotoTinder
             if (!Directory.Exists(_removedPhotosName))
                 Directory.CreateDirectory(_removedPhotosName);
 
+            File.Move(_listOfPhotos.GetActivePhotoUri().AbsolutePath, _removedPhotosName + @"\" + _listOfPhotos.GetActivePhotoFileName());
+            
             _listOfPhotos.RemoveActivePhoto();
-            File.Delete(_listOfPhotos.GetActivePhotoUri().AbsolutePath);
-
-
-//            File.Copy(_listOfPhotos.GetActivePhotoUri().AbsolutePath, _removedPhotosName + @"\" + _listOfPhotos.GetActivePhotoFileName());
-//
-//            _listOfPhotos.RemoveActivePhoto();
         }
 
         /// <summary>
@@ -79,10 +82,7 @@ namespace PhotoTinder
             if (!Directory.Exists(_acceptedPhotosName))
                 Directory.CreateDirectory(_acceptedPhotosName);
 
-            Trace.WriteLine("Folder path: " + _acceptedPhotosName);  //for debugging purposes
-            Trace.WriteLine("Active Photo Uri " + _listOfPhotos.GetActivePhotoUri());
-
-            File.Copy(_listOfPhotos.GetActivePhotoUri().AbsolutePath, _acceptedPhotosName + @"\" + _listOfPhotos.GetActivePhotoFileName());
+            File.Move(_listOfPhotos.GetActivePhotoUri().AbsolutePath, _acceptedPhotosName + @"\" + _listOfPhotos.GetActivePhotoFileName());
 
             _listOfPhotos.RemoveActivePhoto();
         }
