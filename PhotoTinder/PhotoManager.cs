@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
+using System.Reflection;
 using System.Text.RegularExpressions;
-using System.Windows.Controls;
 using System.Windows.Forms;
-using System.Windows.Input;
 using System.Windows.Media.Imaging;
-//using Microsoft.Win32;
 
 namespace PhotoTinder
 {
     public class PhotoManager
     {
-        private PhotoList _listOfPhotos;
+        private readonly PhotoList _listOfPhotos;
         private string _acceptedPhotosName = "Accepted Photos";     //folder name for accepted photos
         private string _removedPhotosName = "Removed Photos";       //folder name for removed photos
 
@@ -31,7 +31,6 @@ namespace PhotoTinder
                 {
                     foreach (var openFile in openFileDialog.FileNames)
                     {
-                        var fileUri = new Uri(openFile);
                         _listOfPhotos.AddPhoto(openFile);
                     }
                 }
@@ -48,37 +47,36 @@ namespace PhotoTinder
 
         public BitmapImage GetNextPhoto()
         {
-            return _listOfPhotos.GetNextPhoto();
+            return _listOfPhotos.IsEmpty() ? GetClosingImage() : _listOfPhotos.GetNextPhoto();
         }
 
         public BitmapImage GetPreviousPhoto()
         {
-            return _listOfPhotos.GetPreviousPhoto();
+            return _listOfPhotos.IsEmpty() ? GetClosingImage() : _listOfPhotos.GetPreviousPhoto();
         }
 
         public BitmapImage GetActivePhoto()
         {
-            if(_listOfPhotos.GetActivePhoto() == null)
-                return new BitmapImage(new Uri(@"https://upload.wikimedia.org/wikipedia/commons/3/30/Googlelogo.png"));
-            else
-                return _listOfPhotos.GetActivePhoto();
+            return _listOfPhotos.GetActivePhoto() ?? GetClosingImage();
         }
 
         public void DeletePhoto()
         {
+            if (_listOfPhotos.IsEmpty()) return;
             if (!Directory.Exists(_removedPhotosName))
                 Directory.CreateDirectory(_removedPhotosName);
 
             File.Move(_listOfPhotos.GetActivePhotoUri().AbsolutePath, _removedPhotosName + @"\" + _listOfPhotos.GetActivePhotoFileName());
-            
+
             _listOfPhotos.RemoveActivePhoto();
         }
 
         /// <summary>
-        /// Moves active photo to folder with accepted photos. Creates that folder if it doesn't exist. Don't forget to update displayed photo (using getActivePhoto method).
+        /// Moves active photo to folder with accepted photos. Creates that folder if it doesn't exist. Don't forget to update displayed photo (using getActivePhoto method).                                                                                                                       
         /// </summary>
         public void AcceptPhoto()       
         {
+            if (_listOfPhotos.IsEmpty()) return;
             if (!Directory.Exists(_acceptedPhotosName))
                 Directory.CreateDirectory(_acceptedPhotosName);
 
@@ -86,5 +84,33 @@ namespace PhotoTinder
 
             _listOfPhotos.RemoveActivePhoto();
         }
+
+        private static BitmapImage GetClosingImage()
+        {
+            return BitmapToBitmapImage(Properties.Resources.ClosingImage);
+        }
+        /// <summary>
+        /// Function borrowed from StackOverflow to convert Bitmap to BitmapImage.
+        /// </summary>
+        public static BitmapImage BitmapToBitmapImage(Bitmap bitmap)
+        {
+            using (var memory = new MemoryStream())
+            {
+                bitmap.Save(memory, ImageFormat.Png);
+                memory.Position = 0;
+
+                var bitmapImage = new BitmapImage();
+                bitmapImage.BeginInit();
+                bitmapImage.StreamSource = memory;
+                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapImage.EndInit();
+                bitmapImage.Freeze();
+
+                return bitmapImage;
+            }
+        }
+
     }
+
+
 }

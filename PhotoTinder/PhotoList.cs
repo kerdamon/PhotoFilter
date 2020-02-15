@@ -1,19 +1,14 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Security;
-using System.Text.RegularExpressions;
 using System.Windows.Media.Imaging;
 
 namespace PhotoTinder
 {
     public class PhotoList
     {
-        private Dictionary<string, BitmapImage> _listOfPhotos;
+        private readonly Dictionary<string, BitmapImage> _listOfPhotos;
         public int ActivePhotoIndex { get; private set; }
 
         public PhotoList()
@@ -23,42 +18,41 @@ namespace PhotoTinder
 
         public BitmapImage GetActivePhoto()
         {
-            if (_listOfPhotos.Count == 0) return null;
+            if (IsEmpty()) return null;
             var photo = _listOfPhotos.ElementAt(ActivePhotoIndex);
-
-                return photo.Value;
+            return photo.Value;
         }
 
         public BitmapImage GetNextPhoto()
         {
-            if (_listOfPhotos.Count == 0) return null;
-            if (ActivePhotoIndex >= (_listOfPhotos.Count - 1))
-            {
-                ActivePhotoIndex = 0;
-            }
-            else
-            {
-                ActivePhotoIndex++;
-            }
-
+            if (IsEmpty()) return null;
+            IncrementPhotoIndex();
             var photo = _listOfPhotos.ElementAt(ActivePhotoIndex);
             return photo.Value;
         }
 
+        private void IncrementPhotoIndex()
+        {
+            if (ActivePhotoIndex >= (_listOfPhotos.Count - 1))
+                ActivePhotoIndex = 0;
+            else
+                ActivePhotoIndex++;
+        }
+
         public BitmapImage GetPreviousPhoto()
         {
-            if (_listOfPhotos.Count == 0) return null;
-            if (ActivePhotoIndex <= 0)
-            {
-                ActivePhotoIndex = _listOfPhotos.Count - 1;
-            }
-            else
-            {
-                ActivePhotoIndex--;
-            }
-
+            if (IsEmpty()) return null;
+            DecrementPhotoIndex();
             var photo = _listOfPhotos.ElementAt(ActivePhotoIndex);
             return photo.Value;
+        }
+
+        private void DecrementPhotoIndex()
+        {
+            if (ActivePhotoIndex <= 0)
+                ActivePhotoIndex = _listOfPhotos.Count - 1;
+            else
+                ActivePhotoIndex--;
         }
 
         public Uri GetActivePhotoUri()
@@ -77,11 +71,12 @@ namespace PhotoTinder
         public void RemoveActivePhoto()
         {
             _listOfPhotos.Remove(_listOfPhotos.ElementAt(ActivePhotoIndex).Key);
+            IncrementPhotoIndex();
         }
 
         public void AddPhoto(string fileName)
         {
-            BitmapImage image = new BitmapImage();
+            var image = new BitmapImage();
 
             using (var stream = File.OpenRead(fileName))
             {
@@ -97,6 +92,11 @@ namespace PhotoTinder
         public int Length()
         {
             return _listOfPhotos.Count;
+        }
+
+        public bool IsEmpty()
+        {
+            return _listOfPhotos.Count <= 0;
         }
 
         public void Clear()
