@@ -121,4 +121,7 @@
   <data name="ClosingImage" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ClosingImage.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="PhotoManager_ChoosePhotos_Image_files____png___jpeg____png___jpeg" xml:space="preserve">
+    <value>Image files (*.png;*.jpeg)|*.png;*.jpeg</value>
+  </data>
 </root>
