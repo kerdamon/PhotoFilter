@@ -27,15 +27,19 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <Button Name="BtnChooseFiles" Grid.Row="0" Grid.ColumnSpan="2" Content="Choose Files (multiselect)" Click="BtnChooseFiles_OnClick" Margin="5"/>
-                <Button Name="BtnDeletePhoto" Grid.Row="1" Grid.Column="0" Content="Remove Photo" Click="BtnDeletePhoto_OnClick" Margin="5"/>
-                <Button Name="BtnAcceptPhoto" Grid.Row="1" Grid.Column="1" Content="Accept Photo" Click="BtnAcceptPhoto_OnClick" Margin="5"/>
+                <Button Name="BtnChoosePhotoFiles" Grid.Row="0" Grid.ColumnSpan="3" Content="Choose Files (multiselect)" Click="BtnChooseFiles_OnClick" Margin="5"/>
+                <Button Name="BtnChoosePhotoFolder" Grid.Row="1" Grid.ColumnSpan="3" Grid.Column="0" Content="Choose Folder" Click="BtnChoosePhotoFolder_OnClick" Margin="5"/>
+                <Button Name="BtnDeletePhoto" Grid.Row="2" Grid.Column="0" Content="Remove Photo" Click="BtnDeletePhoto_OnClick" Margin="5"/>
+                <Button Name="BtnOpenInImageViewer" Grid.Row="2" Grid.Column="1" Content="Open photo in image viewer" Click="BtnOpenInImageViewer_OnClick" Margin="5"/>
+                <Button Name="BtnAcceptPhoto" Grid.Row="2" Grid.Column="2" Content="Accept Photo" Click="BtnAcceptPhoto_OnClick" Margin="5"/>
 
             </Grid>
 
