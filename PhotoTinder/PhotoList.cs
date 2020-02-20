@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Media.Imaging;
@@ -84,15 +83,20 @@ namespace PhotoTinder
         public void RemoveActivePhoto()
         {
             _listOfPhotos.Remove(_listOfPhotos.ElementAt(ActivePhotoIndex).Key);
-            //IncrementPhotoIndex();
             if (ActivePhotoIndex >= (_listOfPhotos.Count - 1))
                 ActivePhotoIndex = 0;
         }
 
         public void AddPhoto(string fileName)
         {
-            if (Path.GetExtension(fileName) == ".jpg" || Path.GetExtension(fileName) == ".jpeg" || Path.GetExtension(fileName) == ".png")   //to change to be more general
+            if (HasImageExtension(fileName))   //to change to be more general
                 _listOfPhotos.Add(fileName, null);
+        }
+
+        private static bool HasImageExtension(string fileName)
+        {
+            return (Path.GetExtension(fileName) == ".jpg" || Path.GetExtension(fileName) == ".jpeg" ||
+                    Path.GetExtension(fileName) == ".png");
         }
 
         public bool IsEmpty()
@@ -125,7 +129,6 @@ namespace PhotoTinder
         {
             _listOfPhotos[fileName] = null;
         }
-
 
     }
 }

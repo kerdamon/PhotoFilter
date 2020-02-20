@@ -38,8 +38,19 @@ namespace PhotoTinder
 
         private void BtnChooseFiles_OnClick(object sender, RoutedEventArgs e)
         {
-            _photoManager.ChoosePhotos();
+            _photoManager.ChoosePhotoFiles();
             ImgDisplayedPhoto.Source = _photoManager.GetActivePhoto();       //shows first photo after files were chosen
+        }
+
+        private void BtnOpenInImageViewer_OnClick(object sender, RoutedEventArgs e)
+        {
+            _photoManager.OpenActivePhotoInImageViewer();
+        }
+
+        private void BtnChoosePhotoFolder_OnClick(object sender, RoutedEventArgs e)
+        {
+            _photoManager.ChoosePhotoFolder();
+            ImgDisplayedPhoto.Source = _photoManager.GetActivePhoto();
         }
     }
 }
