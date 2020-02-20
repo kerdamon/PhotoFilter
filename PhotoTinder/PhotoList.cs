@@ -27,9 +27,15 @@ namespace PhotoTinder
         public BitmapImage GetNextPhoto()
         {
             if (IsEmpty()) return null;
+            
+            if (_listOfPhotos.ElementAt(ActivePhotoIndex).Value != null)
+                UnLoadImage(_listOfPhotos.ElementAt(ActivePhotoIndex).Key);
+            
             IncrementPhotoIndex();
+            
             if(_listOfPhotos.ElementAt(ActivePhotoIndex).Value == null)
                 LoadImage(_listOfPhotos.ElementAt(ActivePhotoIndex).Key);
+            
             return _listOfPhotos.ElementAt(ActivePhotoIndex).Value;
         }
 
@@ -44,9 +50,15 @@ namespace PhotoTinder
         public BitmapImage GetPreviousPhoto()
         {
             if (IsEmpty()) return null;
+
+            if (_listOfPhotos.ElementAt(ActivePhotoIndex).Value != null)
+                UnLoadImage(_listOfPhotos.ElementAt(ActivePhotoIndex).Key);
+
             DecrementPhotoIndex();
+
             if (_listOfPhotos.ElementAt(ActivePhotoIndex).Value == null)
                 LoadImage(_listOfPhotos.ElementAt(ActivePhotoIndex).Key);
+
             return _listOfPhotos.ElementAt(ActivePhotoIndex).Value;
         }
 
@@ -72,7 +84,9 @@ namespace PhotoTinder
         public void RemoveActivePhoto()
         {
             _listOfPhotos.Remove(_listOfPhotos.ElementAt(ActivePhotoIndex).Key);
-            IncrementPhotoIndex();
+            //IncrementPhotoIndex();
+            if (ActivePhotoIndex >= (_listOfPhotos.Count - 1))
+                ActivePhotoIndex = 0;
         }
 
         public void AddPhoto(string fileName)
@@ -106,5 +120,12 @@ namespace PhotoTinder
 
             _listOfPhotos[fileName] = image;
         }
+
+        private void UnLoadImage(string fileName)
+        {
+            _listOfPhotos[fileName] = null;
+        }
+
+
     }
 }
