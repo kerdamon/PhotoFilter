@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Media.Imaging;
@@ -129,6 +129,6 @@ namespace PhotoTinder
         {
             _listOfPhotos[fileName] = null;
         }
-
+      
     }
 }
