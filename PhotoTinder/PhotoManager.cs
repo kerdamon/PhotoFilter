@@ -25,7 +25,7 @@ namespace PhotoTinder
         {
             _listOfPhotos.Clear();
 
-            using (var openFileDialog = new OpenFileDialog {Multiselect = true})
+            using (var openFileDialog = new OpenFileDialog {Multiselect = true, Filter = "Image files (*.png;*.jpeg;*.jpg)|*.png;*.jpeg;*.jpg" })
             {
                 if (openFileDialog.ShowDialog() == DialogResult.OK) //load selected photos to _listOfPhotos
                 {
@@ -66,7 +66,7 @@ namespace PhotoTinder
             if (!Directory.Exists(_removedPhotosName))
                 Directory.CreateDirectory(_removedPhotosName);
 
-            File.Move(_listOfPhotos.GetActivePhotoUri().AbsolutePath, _removedPhotosName + @"\" + _listOfPhotos.GetActivePhotoFileName());
+            File.Move(_listOfPhotos.GetActivePhotoPath(), _removedPhotosName + @"\" + _listOfPhotos.GetActivePhotoFileName());
 
             _listOfPhotos.RemoveActivePhoto();
         }
@@ -80,7 +80,7 @@ namespace PhotoTinder
             if (!Directory.Exists(_acceptedPhotosName))
                 Directory.CreateDirectory(_acceptedPhotosName);
 
-            File.Move(_listOfPhotos.GetActivePhotoUri().AbsolutePath, _acceptedPhotosName + @"\" + _listOfPhotos.GetActivePhotoFileName());
+            File.Move(_listOfPhotos.GetActivePhotoPath(), _acceptedPhotosName + @"\" + _listOfPhotos.GetActivePhotoFileName());
 
             _listOfPhotos.RemoveActivePhoto();
         }

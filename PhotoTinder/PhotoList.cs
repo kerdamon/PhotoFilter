@@ -19,16 +19,18 @@ namespace PhotoTinder
         public BitmapImage GetActivePhoto()
         {
             if (IsEmpty()) return null;
-            var photo = _listOfPhotos.ElementAt(ActivePhotoIndex);
-            return photo.Value;
+            if (_listOfPhotos.ElementAt(ActivePhotoIndex).Value == null)
+                LoadImage(_listOfPhotos.ElementAt(ActivePhotoIndex).Key);
+            return _listOfPhotos.ElementAt(ActivePhotoIndex).Value;
         }
 
         public BitmapImage GetNextPhoto()
         {
             if (IsEmpty()) return null;
             IncrementPhotoIndex();
-            var photo = _listOfPhotos.ElementAt(ActivePhotoIndex);
-            return photo.Value;
+            if(_listOfPhotos.ElementAt(ActivePhotoIndex).Value == null)
+                LoadImage(_listOfPhotos.ElementAt(ActivePhotoIndex).Key);
+            return _listOfPhotos.ElementAt(ActivePhotoIndex).Value;
         }
 
         private void IncrementPhotoIndex()
@@ -43,8 +45,9 @@ namespace PhotoTinder
         {
             if (IsEmpty()) return null;
             DecrementPhotoIndex();
-            var photo = _listOfPhotos.ElementAt(ActivePhotoIndex);
-            return photo.Value;
+            if (_listOfPhotos.ElementAt(ActivePhotoIndex).Value == null)
+                LoadImage(_listOfPhotos.ElementAt(ActivePhotoIndex).Key);
+            return _listOfPhotos.ElementAt(ActivePhotoIndex).Value;
         }
 
         private void DecrementPhotoIndex()
@@ -55,11 +58,9 @@ namespace PhotoTinder
                 ActivePhotoIndex--;
         }
 
-        public Uri GetActivePhotoUri()
+        public string GetActivePhotoPath()
         {
-            if (_listOfPhotos.Count == 0) return null;
-            var photo = _listOfPhotos.ElementAt(ActivePhotoIndex);
-            return new Uri(photo.Key);
+            return IsEmpty() ? null : _listOfPhotos.ElementAt(ActivePhotoIndex).Key;
         }
 
         public string GetActivePhotoFileName()
@@ -76,22 +77,8 @@ namespace PhotoTinder
 
         public void AddPhoto(string fileName)
         {
-            var image = new BitmapImage();
-
-            using (var stream = File.OpenRead(fileName))
-            {
-                image.BeginInit();
-                image.CacheOption = BitmapCacheOption.OnLoad;
-                image.StreamSource = stream;
-                image.EndInit();
-            }
-
-            _listOfPhotos.Add(fileName, image);
-        }
-
-        public int Length()
-        {
-            return _listOfPhotos.Count;
+            if (Path.GetExtension(fileName) == ".jpg" || Path.GetExtension(fileName) == ".jpeg" || Path.GetExtension(fileName) == ".png")   //to change to be more general
+                _listOfPhotos.Add(fileName, null);
         }
 
         public bool IsEmpty()
@@ -103,6 +90,21 @@ namespace PhotoTinder
         {
             _listOfPhotos.Clear();
             ActivePhotoIndex = 0;
+        }
+
+        private void LoadImage(string fileName)
+        {
+            var image = new BitmapImage();
+
+            using (var stream = File.OpenRead(fileName))
+            {
+                image.BeginInit();
+                image.CacheOption = BitmapCacheOption.OnLoad;
+                image.StreamSource = stream;
+                image.EndInit();
+            }
+
+            _listOfPhotos[fileName] = image;
         }
     }
 }

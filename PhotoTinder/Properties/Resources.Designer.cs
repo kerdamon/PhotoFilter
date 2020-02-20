@@ -69,5 +69,14 @@ namespace PhotoTinder.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Image files (*.png;*.jpeg)|*.png;*.jpeg.
+        /// </summary>
+        internal static string PhotoManager_ChoosePhotos_Image_files____png___jpeg____png___jpeg {
+            get {
+                return ResourceManager.GetString("PhotoManager_ChoosePhotos_Image_files____png___jpeg____png___jpeg", resourceCulture);
+            }
+        }
     }
 }
