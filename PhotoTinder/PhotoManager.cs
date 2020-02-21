@@ -109,6 +109,7 @@ namespace PhotoTinder
         {
             return BitmapToBitmapImage(Properties.Resources.ClosingImage);
         }
+
         /// <summary>
         /// Function borrowed from StackOverflow to convert Bitmap to BitmapImage.
         /// </summary>

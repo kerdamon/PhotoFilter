@@ -89,7 +89,7 @@ namespace PhotoTinder
 
         public void AddPhoto(string fileName)
         {
-            if (HasImageExtension(fileName))   //to change to be more general
+            if (HasImageExtension(fileName))
                 _listOfPhotos.Add(fileName, null);
         }
 
