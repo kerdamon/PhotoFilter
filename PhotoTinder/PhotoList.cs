@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,6 +10,10 @@ namespace PhotoTinder
     {
         private readonly Dictionary<string, BitmapImage> _listOfPhotos;
         public int ActivePhotoIndex { get; private set; }
+        private string ActivePhotoFileName => _listOfPhotos.ElementAt(ActivePhotoIndex).Key;
+        private BitmapImage ActivePhotoBitmapImage => _listOfPhotos.ElementAt(ActivePhotoIndex).Value;
+
+
 
         public PhotoList()
         {
@@ -17,25 +22,39 @@ namespace PhotoTinder
 
         public BitmapImage GetActivePhoto()
         {
-            if (IsEmpty()) return null;
-            if (_listOfPhotos.ElementAt(ActivePhotoIndex).Value == null)
-                LoadImage(_listOfPhotos.ElementAt(ActivePhotoIndex).Key);
-            return _listOfPhotos.ElementAt(ActivePhotoIndex).Value;
+            return GetPhoto(null, 0);
         }
 
         public BitmapImage GetNextPhoto()
         {
+            return GetPhoto(IncrementPhotoIndex, -5);
+        }
+
+        public BitmapImage GetPreviousPhoto()
+        {
+            return GetPhoto(DecrementPhotoIndex, 5);
+        }
+
+        /// <summary>
+        /// Loads previous, current or next photo depending on first argument, which is function incrementing or decrementing photo index. Second argument is index (relative to active photo index) indicating photo that will be unloaded (for memory optimization purposes). If second argument is 0, none photo will be unloaded.
+        /// </summary>
+        private BitmapImage GetPhoto(Action changeIndex, int unloadIndex)
+        {
             if (IsEmpty()) return null;
-            
-            if (_listOfPhotos.ElementAt(ActivePhotoIndex).Value != null)
-                UnLoadImage(_listOfPhotos.ElementAt(ActivePhotoIndex).Key);
-            
-            IncrementPhotoIndex();
-            
-            if(_listOfPhotos.ElementAt(ActivePhotoIndex).Value == null)
-                LoadImage(_listOfPhotos.ElementAt(ActivePhotoIndex).Key);
-            
-            return _listOfPhotos.ElementAt(ActivePhotoIndex).Value;
+
+            changeIndex?.Invoke();
+
+            if (unloadIndex != 0)
+            {
+                var offsetPhotoIndex = ActivePhotoIndex + unloadIndex;
+                if (offsetPhotoIndex < _listOfPhotos.Count && offsetPhotoIndex >= 0 && _listOfPhotos.ElementAt(offsetPhotoIndex).Value != null)
+                    UnLoadImage(_listOfPhotos.ElementAt(offsetPhotoIndex).Key);
+            }
+
+            if (ActivePhotoBitmapImage == null)
+                LoadImage(ActivePhotoFileName);
+
+            return ActivePhotoBitmapImage;
         }
 
         private void IncrementPhotoIndex()
@@ -44,21 +63,6 @@ namespace PhotoTinder
                 ActivePhotoIndex = 0;
             else
                 ActivePhotoIndex++;
-        }
-
-        public BitmapImage GetPreviousPhoto()
-        {
-            if (IsEmpty()) return null;
-
-            if (_listOfPhotos.ElementAt(ActivePhotoIndex).Value != null)
-                UnLoadImage(_listOfPhotos.ElementAt(ActivePhotoIndex).Key);
-
-            DecrementPhotoIndex();
-
-            if (_listOfPhotos.ElementAt(ActivePhotoIndex).Value == null)
-                LoadImage(_listOfPhotos.ElementAt(ActivePhotoIndex).Key);
-
-            return _listOfPhotos.ElementAt(ActivePhotoIndex).Value;
         }
 
         private void DecrementPhotoIndex()
@@ -71,18 +75,17 @@ namespace PhotoTinder
 
         public string GetActivePhotoPath()
         {
-            return IsEmpty() ? null : _listOfPhotos.ElementAt(ActivePhotoIndex).Key;
+            return IsEmpty() ? null : ActivePhotoFileName;
         }
 
         public string GetActivePhotoFileName()
         {
-            var temp = _listOfPhotos.ElementAt(ActivePhotoIndex).Key.Split('\\');
-            return temp[temp.Length - 1];
+            return ActivePhotoFileName.Split('\\').Last();
         }
 
         public void RemoveActivePhoto()
         {
-            _listOfPhotos.Remove(_listOfPhotos.ElementAt(ActivePhotoIndex).Key);
+            _listOfPhotos.Remove(ActivePhotoFileName);
             if (ActivePhotoIndex >= (_listOfPhotos.Count - 1))
                 ActivePhotoIndex = 0;
         }
@@ -95,8 +98,7 @@ namespace PhotoTinder
 
         private static bool HasImageExtension(string fileName)
         {
-            return (Path.GetExtension(fileName) == ".jpg" || Path.GetExtension(fileName) == ".jpeg" ||
-                    Path.GetExtension(fileName) == ".png");
+            return new[] {".jpg", ".jpeg", ".png"}.Contains(Path.GetExtension(fileName));
         }
 
         public bool IsEmpty()

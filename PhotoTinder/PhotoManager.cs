@@ -82,12 +82,7 @@ namespace PhotoTinder
 
         public void DeletePhoto()
         {
-            if (_listOfPhotos.IsEmpty()) return;
-            if (!Directory.Exists(_removedPhotosPath))
-                Directory.CreateDirectory(_removedPhotosPath);
-
-            File.Move(_listOfPhotos.GetActivePhotoPath(), _removedPhotosPath + @"\" + _listOfPhotos.GetActivePhotoFileName());
-
+            MovePhotoToPath(_removedPhotosPath);
             _listOfPhotos.RemoveActivePhoto();
         }
 
@@ -96,13 +91,17 @@ namespace PhotoTinder
         /// </summary>
         public void AcceptPhoto()       
         {
-            if (_listOfPhotos.IsEmpty()) return;
-            if (!Directory.Exists(_acceptedPhotosPath))
-                Directory.CreateDirectory(_acceptedPhotosPath);
-
-            File.Move(_listOfPhotos.GetActivePhotoPath(), _acceptedPhotosPath + @"\" + _listOfPhotos.GetActivePhotoFileName());
-
+            MovePhotoToPath(_acceptedPhotosPath);
             _listOfPhotos.RemoveActivePhoto();
+        }
+
+        private void MovePhotoToPath(string destinationPath)
+        {
+            if (_listOfPhotos.IsEmpty()) return;
+            if (!Directory.Exists(destinationPath))
+                Directory.CreateDirectory(destinationPath);
+
+            File.Move(_listOfPhotos.GetActivePhotoPath(), destinationPath + @"\" + _listOfPhotos.GetActivePhotoFileName());
         }
 
         private static BitmapImage GetClosingImage()
